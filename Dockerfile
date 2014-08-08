@@ -17,11 +17,15 @@ RUN for plugin in chucknorris greenballs scm-api git-client ansicolor descriptio
     do curl -sf -o $JENKINS_HOME/plugins/${plugin}.hpi \
        -L $JENKINS_MIRROR/plugins/${plugin}/latest/${plugin}.hpi ; done
 
-ADD ./start.sh /usr/local/bin/start.sh
+# out2html
+
+RUN curl -sf -o /usr/local/bin/out2html https://drone.io/github.com/larrycai/out2html/files/out2html && chmod +x /usr/local/bin/out2html
 
 # ADD sample proj
 ADD craft-config.xml $JENKINS_HOME/jobs/craft/
 
+# start script
+ADD ./start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
 EXPOSE 8080
