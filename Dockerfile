@@ -22,7 +22,7 @@ RUN for plugin in chucknorris greenballs scm-api git-client ansicolor descriptio
 RUN curl -sf -o /usr/local/bin/out2html https://drone.io/github.com/larrycai/out2html/files/out2html && chmod +x /usr/local/bin/out2html
 
 # ADD sample proj
-ADD craft-config.xml $JENKINS_HOME/jobs/craft/
+ADD craft-config.xml $JENKINS_HOME/jobs/craft/config.xml
 
 # start script
 ADD ./start.sh /usr/local/bin/start.sh
