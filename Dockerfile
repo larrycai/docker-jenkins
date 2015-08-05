@@ -1,31 +1,51 @@
-FROM ubuntu:14.04
+FROM ubuntu:trusty
 
-MAINTAINER Larry Cai <larry.caiyu@gmail.com>
+MAINTAINER Larry Cai <larry.cai@gmail.com>
 
-ENV REFRESHED_AT 2014-08-08
-
-RUN apt-get update -qq && apt-get install -qqy curl openjdk-6-jdk
+RUN apt-get update  && apt-get install -qqy curl openjdk-7-jdk groovy && rm -rf /var/lib/apt/lists/*
 
 ENV JENKINS_HOME /opt/jenkins/data
 ENV JENKINS_MIRROR http://mirrors.jenkins-ci.org
 
-RUN mkdir -p $JENKINS_HOME/plugins $JENKINS_HOME/jobs/craft
-RUN curl -sf -o /opt/jenkins/jenkins.war -L $JENKINS_MIRROR/war-stable/latest/jenkins.war
+# install jenkins.war and plugins
 
-RUN for plugin in chucknorris greenballs scm-api git-client ansicolor description-setter \
-    envinject job-exporter git ws-cleanup ;\
-    do curl -sf -o $JENKINS_HOME/plugins/${plugin}.hpi \
+RUN mkdir -p $JENKINS_HOME/plugins 
+
+RUN curl -o /opt/jenkins/jenkins.war -L $JENKINS_MIRROR/war-stable/latest/jenkins.war
+
+ENV REFRESHED_AT 2015-06-26
+
+# Install some common jenkins plugins (fits to my need)
+# git environment
+RUN for plugin in git scm-api git-client credentials credentials-binding workflow-step-api plain-credentials;\
+    do curl -f -o $JENKINS_HOME/plugins/${plugin}.hpi \
+       -L $JENKINS_MIRROR/plugins/${plugin}/latest/${plugin}.hpi ; done
+	   
+RUN for plugin in job-dsl config-file-provider groovy-postbuild groovy junit testng-plugin claim;\
+    do curl -f -o $JENKINS_HOME/plugins/${plugin}.hpi \
        -L $JENKINS_MIRROR/plugins/${plugin}/latest/${plugin}.hpi ; done
 
-# out2html
+# more needed plugin 
+RUN for plugin in token-macro jquery parameterized-trigger postbuild-task description-setter \
+				throttle-concurrents ws-cleanup gerrit-trigger testng-plugin envinject cobertura \
+				build-flow-plugin buildgraph-view nested-view global-post-script ;\
+    do curl -f -o $JENKINS_HOME/plugins/${plugin}.hpi \
+       -L $JENKINS_MIRROR/plugins/${plugin}/latest/${plugin}.hpi ; done
+	   
+# the credentials needs to be later version to satisfied with other plugins
+# RUN touch $JENKINS_HOME/plugins/credentials.jpi.pinned   
+	   
+ONBUILD COPY JENKINS_HOME $JENKINS_HOME
 
-RUN curl -sf -o /usr/local/bin/out2html https://drone.io/github.com/larrycai/out2html/files/out2html && chmod +x /usr/local/bin/out2html
-
-# ADD sample proj
-ADD craft-config.xml $JENKINS_HOME/jobs/craft/config.xml
+# ONBUILD RUN /install-plugins.sh 
+# ONBUILD RUN /spin-plugins.sh
 
 # start script
-ADD ./start.sh /usr/local/bin/start.sh
+
+COPY . /app
+
+# start script
+COPY ./start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
 EXPOSE 8080
