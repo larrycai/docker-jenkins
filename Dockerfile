@@ -33,12 +33,12 @@ RUN for plugin in token-macro jquery parameterized-trigger postbuild-task descri
        -L $JENKINS_MIRROR/plugins/${plugin}/latest/${plugin}.hpi ; done
 	   
 # the credentials needs to be later version to satisfied with other plugins
-# RUN touch $JENKINS_HOME/plugins/credentials.jpi.pinned   
+RUN touch $JENKINS_HOME/plugins/credentials.jpi.pinned   
 	   
 ONBUILD COPY JENKINS_HOME $JENKINS_HOME
 
 # ONBUILD RUN /install-plugins.sh 
-# ONBUILD RUN /spin-plugins.sh
+# ONBUILD RUN /pin-plugins.sh
 
 # start script
 

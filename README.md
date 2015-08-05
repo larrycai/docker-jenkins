@@ -14,7 +14,7 @@ Mostly in your `Dockerfile`
 	
 == TODO ==
 * install_plugins.sh : to load your own plugins 
-* spin_plugins.sh    : spin some plugins 
+* pin_plugins.sh     : pin some plugins 
 
 == Reference ==
 * Official jenkins image : http://jenkins-ci.org/content/official-jenkins-lts-docker-image 
